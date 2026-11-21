@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 01 - Spring Boot & Microservices</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 26px;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .services-diagram {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .service-badge {
+            flex: 1;
+            max-width: 280px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            text-align: center;
+        }
+
+        .service-badge h4 {
+            color: #1e40af;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .service-badge span {
+            font-size: 12px;
+            color: #3b82f6;
+            font-family: monospace;
+            font-weight: 600;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+        }
+
+        .card h2 {
+            font-size: 18px;
+            color: #0f172a;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .form-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        input[type="number"] {
+            flex: 1;
+            min-width: 180px;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+        }
+
+        button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background-color: var(--primary);
+            color: white;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        ul#productList {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        ul#productList li {
+            padding: 10px 14px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        pre#result {
+            background: #0f172a;
+            color: #38bdf8;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: Consolas, Monaco, monospace;
+            overflow-x: auto;
+            min-height: 50px;
+            white-space: pre-wrap;
+        }
+
+        .badge-tag {
+            font-size: 11px;
+            background: #e0e7ff;
+            color: #4338ca;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Lab 01 – Khởi tạo và giao tiếp giữa các Microservices</h1>
+            <p>Spring Boot Microservices: Product Service (Port 8081) & Order Service (Port 8082)</p>
+        </header>
+
+        <div class="services-diagram">
+            <div class="service-badge">
+                <h4>Product Service</h4>
+                <span>http://localhost:8081</span>
+            </div>
+            <div class="service-badge">
+                <h4>Order Service</h4>
+                <span>http://localhost:8082</span>
+            </div>
+        </div>
+
+        <!-- PHẦN 1: TẢI DANH SÁCH SẢN PHẨM TỪ PRODUCT SERVICE (CÂU F.3) -->
+        <div class="card">
+            <h2>Danh sách sản phẩm <span class="badge-tag">Product Service :8081</span></h2>
+            <div class="form-group">
+                <button onclick="loadProducts()">Tải danh sách sản phẩm</button>
+            </div>
+            <ul id="productList"></ul>
+        </div>
+
+        <!-- PHẦN 2: TÌM SẢN PHẨM THÔNG QUA ORDER SERVICE (CÂU F.3 & F.4) -->
+        <div class="card">
+            <h2>Tìm sản phẩm thông qua Order Service <span class="badge-tag">Order Service :8082 -> Product Service :8081</span></h2>
+            <div class="form-group">
+                <input type="number" id="productId" placeholder="Nhập ID sản phẩm" min="1">
+                <button onclick="findProduct()">Tìm sản phẩm</button>
+            </div>
+            <pre id="result">Kết quả tìm kiếm sẽ hiển thị tại đây...</pre>
+        </div>
+    </div>
+
+    <script>
+        // Gọi API lấy danh sách sản phẩm từ Product Service (Port 8081) - Theo trang 8-9 của Lab 01
+        async function loadProducts() {
+            try {
+                const response = await fetch("http://localhost:8081/api/products");
+                if (!response.ok) {
+                    throw new Error("Không thể tải danh sách sản phẩm");
+                }
+                const products = await response.json();
+                const list = document.getElementById("productList");
+                list.innerHTML = "";
+                if (products.length === 0) {
+                    list.textContent = "Chưa có sản phẩm";
+                    return;
+                }
+                products.forEach(product => {
+                    const li = document.createElement("li");
+                    li.textContent = `${product.id} - ${product.name}`;
+                    list.appendChild(li);
+                });
+            } catch (error) {
+                document.getElementById("productList").textContent = "Lỗi: " + error.message;
+            }
+        }
+
+        // Gọi API tìm sản phẩm thông qua Order Service (Port 8082) - Theo trang 9-10 của Lab 01
+        async function findProduct() {
+            const id = document.getElementById("productId").value;
+            const result = document.getElementById("result");
+
+            if (!id || !Number.isInteger(Number(id)) || Number(id) < 1) {
+                result.textContent = "Vui lòng nhập ID hợp lệ";
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:8082/api/orders/product/${id}`);
+                if (response.status === 404) {
+                    result.textContent = "Không tìm thấy sản phẩm";
+                    return;
+                }
+                if (!response.ok) {
+                    throw new Error("Không thể lấy thông tin sản phẩm");
+                }
+                const product = await response.json();
+                result.textContent = JSON.stringify(product, null, 2);
+            } catch (error) {
+                result.textContent = "Lỗi: " + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
